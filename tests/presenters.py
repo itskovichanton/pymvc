@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional, Union
 
+from dicttoxml import dicttoxml
 from fastapi.encoders import jsonable_encoder, SetIntStr, DictIntStrAny
 from fastapi.responses import JSONResponse
 from fastapi.responses import Response
@@ -11,18 +12,15 @@ from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
 
 @dataclass
 class XMLResultPresenterImpl(ResultPresenter):
+    root = True
+    custom_root = None
+    ids = False
+    attr_type = True
+    cdata = False
 
     def present(self, r: Result) -> Any:
-        data = """<?xml version="1.0"?>
-    <shampoo>
-    <Header>
-        Apply shampoo here.
-    </Header>
-    <Body>
-        You'll have to use soap here.
-    </Body>
-    </shampoo>
-    """
+        data = dicttoxml(vars(r), custom_root=self.custom_root, root=self.root, ids=self.ids,
+                         attr_type=self.attr_type, cdata=self.cdata)
         return Response(content=data, media_type="application/xml")
 
 
