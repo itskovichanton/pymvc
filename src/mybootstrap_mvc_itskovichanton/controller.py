@@ -6,13 +6,12 @@ from src.mybootstrap_ioc_itskovichanton.utils import default_dataclass_field
 from src.mybootstrap_mvc_itskovichanton.error_provider import ErrorProvider
 from src.mybootstrap_mvc_itskovichanton.pipeline import ActionRunner, Action, Call
 from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
-from tests.presenters import JSONResultPresenterImpl
 
 
 @bean
 class Controller:
     action_runner: ActionRunner
-    default_result_presenter: ResultPresenter = default_dataclass_field(JSONResultPresenterImpl())
+    default_result_presenter: ResultPresenter
 
     async def run(self, action: Action, call: Call,
                   error_provider: ErrorProvider = None,
