@@ -3,6 +3,7 @@ from datetime import date
 from typing import Any, Protocol
 
 from fastapi import Request
+from src.mybootstrap_core_itskovichanton import validation
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
 from src.mybootstrap_ioc_itskovichanton.utils import default_dataclass_field
 
@@ -28,8 +29,9 @@ class ExtApi(Protocol):
 @bean
 class ExtApiImpl(ExtApi):
 
-    def read_feed(self, q: str, limit: int = 10) -> list[Feed]:
-        return [Feed(title=f"Title {i}", content=f"{q}") for i in range(1, limit)]
+    def read_feed(self, query: str, limit: int = 10) -> list[Feed]:
+        validation.check_empty("query", query, "Не указан текст запроса")
+        return [Feed(title=f"Title {i}", content=f"{query}") for i in range(1, limit)]
 
 
 @bean
@@ -41,7 +43,7 @@ class SearchFeedAction(Action):
             return {'answer': args.limit / 0}  # just for tests
         if args.limit == 11:
             return f"Today is {date.today()}, query={args.query}, ip={args.ip}"
-        return self.ext_api.read_feed("args.query", limit=10)
+        return self.ext_api.read_feed(args.query, limit=10)
 
 
 @bean

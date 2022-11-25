@@ -6,7 +6,6 @@ from tests.server import TestServer
 
 def main() -> None:
     app = injector.inject(ServerMVCApp)
-    server.a = 10
     server.srv = injector.inject(TestServer)
     app.run()
     #

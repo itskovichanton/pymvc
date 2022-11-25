@@ -8,6 +8,7 @@ from fastapi.responses import Response
 
 from src.mybootstrap_mvc_itskovichanton.pipeline import Result
 from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
+from src.mybootstrap_mvc_itskovichanton.utils import object_to_dict
 
 
 @dataclass
@@ -19,7 +20,7 @@ class XMLResultPresenterImpl(ResultPresenter):
     cdata = False
 
     def present(self, r: Result) -> Any:
-        data = dicttoxml(vars(r), custom_root=self.custom_root, root=self.root, ids=self.ids,
+        data = dicttoxml(object_to_dict(r), custom_root=self.custom_root, root=self.root, ids=self.ids,
                          attr_type=self.attr_type, cdata=self.cdata)
         return Response(content=data, media_type="application/xml")
 
@@ -36,7 +37,8 @@ class JSONResultPresenterImpl(ResultPresenter):
     def present(self, r: Result) -> Any:
         return JSONResponse(
             status_code=self.http_code(r),
-            content=jsonable_encoder(r, exclude_unset=self.exclude_unset, exclude_none=self.exclude_none,
+            content=jsonable_encoder(object_to_dict(r), exclude_unset=self.exclude_unset,
+                                     exclude_none=self.exclude_none,
                                      exclude_defaults=self.exclude_defaults,
                                      exclude=self.exclude, by_alias=self.by_alias,
                                      sqlalchemy_safe=self.sqlalchemy_safe),

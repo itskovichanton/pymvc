@@ -20,7 +20,7 @@ srv: TestServer
 
 
 @fast_api.get("/search1/{table}")
-async def m1(table: str, request: Request, q: str, limit: int = 0, count: int = 100):
+async def m1(table: str, request: Request, q: str = None, limit: int = 0, count: int = 100):
     return await srv.test_controller.test(table, request, q, limit, count)
 
 
