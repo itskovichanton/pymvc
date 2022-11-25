@@ -9,7 +9,7 @@ from src.mybootstrap_ioc_itskovichanton.utils import default_dataclass_field
 from src.mybootstrap_mvc_itskovichanton.controller import Controller
 from src.mybootstrap_mvc_itskovichanton.pipeline import Action
 from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
-from tests.presenters import XMLResultPresenterImpl
+from tests.presenters import XMLResultPresenterImpl, JSONResultPresenterImpl
 from tests.utils import get_call_from_request
 
 
@@ -54,6 +54,7 @@ class TestAction(Action):
 @bean
 class TestController(Controller):
     search_feed_action: SearchFeedAction
+    default_result_presenter: ResultPresenter = default_dataclass_field(JSONResultPresenterImpl())
 
     async def test(self, table: str, request: Request, q: str, limit: int = 0, count: int = 100):
         call = get_call_from_request(request)
