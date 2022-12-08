@@ -1,10 +1,9 @@
 from typing import Any
 
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
-from src.mybootstrap_ioc_itskovichanton.utils import default_dataclass_field
 
 from src.mybootstrap_mvc_itskovichanton.error_provider import ErrorProvider
-from src.mybootstrap_mvc_itskovichanton.pipeline import ActionRunner, Action, Call
+from src.mybootstrap_mvc_itskovichanton.pipeline import ActionRunner, Action
 from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
 
 
@@ -13,7 +12,7 @@ class Controller:
     action_runner: ActionRunner
     default_result_presenter: ResultPresenter
 
-    async def run(self, action: Action, call: Call,
+    async def run(self, action: Action, call: Any,
                   error_provider: ErrorProvider = None,
                   result_presenter: ResultPresenter = None) -> Any:
         result = await self.action_runner.run(action, call, error_provider=error_provider)

@@ -27,7 +27,7 @@ class Action(Protocol):
 
 class ActionRunner:
 
-    async def run(self, action: Action, call: Call, error_provider: ErrorProvider = None) -> Result:
+    async def run(self, action: Action, call: Any, error_provider: ErrorProvider = None) -> Result:
         """runs action"""
 
 
@@ -36,8 +36,7 @@ class ActionRunnerImpl(ActionRunner):
     default_error_provider: ErrorProvider
     alert_service: AlertService
 
-    async def run(self, action: Action, call: Call, error_provider: ErrorProvider = None) -> Result:
-
+    async def run(self, action: Action, call: Any, error_provider: ErrorProvider = None) -> Result:
         r = Result()
         try:
             r.result = action.run(call)
