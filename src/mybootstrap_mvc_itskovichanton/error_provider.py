@@ -34,7 +34,8 @@ class ErrorProviderImpl(ErrorProvider):
         r = Err(message=self.calc_msg(e), details=self.calc_details(e), reason=self.calc_reason(e))
         if isinstance(e, ValidationException):
             r.param = e.param
-            r.invalid_value = e.invalid_value
+            if hasattr(e, "invalid_value"):
+                r.invalid_value = e.invalid_value
             r.validation_reason = e.validation_reason
         return r
 
