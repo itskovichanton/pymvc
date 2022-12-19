@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Protocol, Any
+from typing import Protocol, Any, Callable
 
 from src.mybootstrap_core_itskovichanton.alerts import AlertService
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
@@ -21,13 +21,21 @@ class Result:
 
 
 class Action(Protocol):
-    def run(self, args: Any) -> Any:
+    def run(self, args: Any = None, prev_result: Any = None) -> Any:
         """Run action"""
+
+
+@dataclass
+class CallableAction(Action):
+    call: Callable[[Any, Any], Any]
+
+    def run(self, args: Any = None, prev_result: Any = None) -> Any:
+        return self.call(args, prev_result)
 
 
 class ActionRunner:
 
-    async def run(self, action: Action, call: Any, error_provider: ErrorProvider = None) -> Result:
+    async def run(self, *actions: Action, call: Any = None, error_provider: ErrorProvider = None) -> Result:
         """runs action"""
 
 
@@ -36,15 +44,16 @@ class ActionRunnerImpl(ActionRunner):
     default_error_provider: ErrorProvider
     alert_service: AlertService
 
-    async def run(self, action: Action, call: Any, error_provider: ErrorProvider = None) -> Result:
+    async def run(self, *actions: Action, call: Any = None, error_provider: ErrorProvider = None) -> Result:
         r = Result()
-        try:
-            r.result = action.run(call)
-        except BaseException as e:
-            await self.alert_service.handle(e)
-            if error_provider is None:
-                error_provider = self.default_error_provider
-            r.error = error_provider.provide_error(e)
+        for action in actions[0]:
+            try:
+                r.result = action.run(call, r.result)
+            except BaseException as e:
+                await self.alert_service.handle(e)
+                if error_provider is None:
+                    error_provider = self.default_error_provider
+                r.error = error_provider.provide_error(e)
+                break
 
-        # todo: добавь логгирование
         return r

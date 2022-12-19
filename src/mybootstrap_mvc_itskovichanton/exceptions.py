@@ -13,7 +13,9 @@ ERR_REASON_TOO_MANY_REQUESTS = "TO_MANY_REQUESTS"
 class CoreException(BaseException):
     """Base exception, that has message and reason properties"""
 
-    def __init__(self, message, reason=ERR_REASON_SERVER_RESPONDED_WITH_ERROR, cause: BaseException = None):
+    def __init__(self, message = None, reason=ERR_REASON_SERVER_RESPONDED_WITH_ERROR, cause: BaseException = None):
+        if not message and cause:
+            message = str(cause)
         self.reason = reason
         self.message = message
         self.cause = cause
