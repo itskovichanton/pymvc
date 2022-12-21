@@ -27,7 +27,8 @@ class ErrorProvider(Protocol):
         """Get error presentation. Также можно возвращать потомки Err"""
 
 
-@bean
+@bean(details_enabled=("mvc.response.details", bool, True),
+      original_msg=("mvc.response.original_error_msg", bool, True))
 class ErrorProviderImpl(ErrorProvider):
 
     def provide_error(self, e: BaseException) -> Err:
@@ -40,10 +41,10 @@ class ErrorProviderImpl(ErrorProvider):
         return r
 
     def calc_msg(self, e: BaseException):
-        return ERR_MSG_INTERNAL if self._context.profile == "prod" else str(e)
+        return str(e) if self.original_msg else ERR_MSG_INTERNAL
 
     def calc_details(self, e: BaseException):
-        return None if self._context.profile == "prod" else traceback.format_exc()
+        return "\n.".join(traceback.format_exception(e)) if self.details_enabled else None
 
     def calc_reason(self, e: BaseException):
         return e.reason if isinstance(e, CoreException) else ERR_REASON_INTERNAL
