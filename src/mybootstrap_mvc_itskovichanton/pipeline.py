@@ -50,7 +50,7 @@ class ActionRunnerImpl(ActionRunner):
             try:
                 r.result = action.run(call, r.result)
             except BaseException as e:
-                await self.alert_service.handle(e)
+                self.alert_service.handle(e)
                 if error_provider is None:
                     error_provider = self.default_error_provider
                 r.error = error_provider.provide_error(e)
