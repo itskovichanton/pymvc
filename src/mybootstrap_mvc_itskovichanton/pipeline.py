@@ -1,3 +1,4 @@
+import inspect
 from dataclasses import dataclass
 from typing import Protocol, Any, Callable
 
@@ -48,7 +49,10 @@ class ActionRunnerImpl(ActionRunner):
         r = Result()
         for action in actions[0]:
             try:
-                r.result = action.run(call, r.result)
+                if inspect.iscoroutinefunction(action.run):
+                    r.result = await action.run(call, r.result)
+                else:
+                    r.result = action.run(call, r.result)
             except BaseException as e:
                 self.alert_service.handle(e)
                 if error_provider is None:

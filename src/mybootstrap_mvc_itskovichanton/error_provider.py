@@ -15,6 +15,7 @@ class Err:
     message: str = None
     details: str = None
     reason: str = None
+    context: str = None
 
 
 # @dataclass
@@ -38,6 +39,12 @@ class ErrorProviderImpl(ErrorProvider):
             if hasattr(e, "invalid_value"):
                 r.invalid_value = e.invalid_value
             r.validation_reason = e.validation_reason
+        e_dict = e.__dict__
+        if e_dict:
+            try:
+                r.context = {k: str(v) for k, v in e_dict.items() if k not in r.__dict__}
+            except:
+                ...
         return r
 
     def calc_msg(self, e: BaseException):
