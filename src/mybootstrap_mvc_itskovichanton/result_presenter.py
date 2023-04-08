@@ -12,6 +12,7 @@ class ResultPresenter(Protocol):
     def http_code(self, r: Result) -> int:
         if r.error is None:
             return 200
+
         match r.error.reason:
             case exceptions.ERR_REASON_SERVER_RESPONDED_WITH_ERROR:
                 return 200
@@ -27,5 +28,5 @@ class ResultPresenter(Protocol):
                 return 401
             case exceptions.ERR_REASON_SERVER_RESPONDED_WITH_ERROR_NOT_FOUND:
                 return 404
-            case _:
-                return 500
+
+        return 500

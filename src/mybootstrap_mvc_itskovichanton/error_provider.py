@@ -18,11 +18,6 @@ class Err:
     context: str = None
 
 
-# @dataclass
-# class ErrWithInfo(Err):
-#     info: str = None
-#
-
 class ErrorProvider(Protocol):
     def provide_error(self, e: BaseException) -> Err:
         """Get error presentation. Также можно возвращать потомки Err"""
