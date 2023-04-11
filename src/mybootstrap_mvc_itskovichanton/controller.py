@@ -1,7 +1,5 @@
 from typing import Any
 
-from src.mybootstrap_ioc_itskovichanton.ioc import bean
-from dataclasses import dataclass, field
 from src.mybootstrap_mvc_itskovichanton.error_provider import ErrorProvider
 from src.mybootstrap_mvc_itskovichanton.pipeline import ActionRunner, Action
 from src.mybootstrap_mvc_itskovichanton.result_presenter import ResultPresenter
