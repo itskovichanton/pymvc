@@ -1,6 +1,6 @@
 import inspect
 from dataclasses import dataclass
-from typing import Protocol, Any, Callable
+from typing import Any, Callable
 
 from src.mybootstrap_core_itskovichanton.alerts import AlertService
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
@@ -21,7 +21,7 @@ class Result:
     error: Err = None
 
 
-class Action(Protocol):
+class Action:
     def run(self, args: Any = None, prev_result: Any = None) -> Any:
         """Run action"""
 
@@ -36,7 +36,8 @@ class CallableAction(Action):
 
 class ActionRunner:
 
-    async def run(self, *actions: Action, call: Any = None, error_provider: ErrorProvider = None) -> Result:
+    async def run(self, *actions: Action | Callable[[Any, Any], Any], call: Any = None,
+                  error_provider: ErrorProvider = None) -> Result:
         """runs action"""
 
 
@@ -45,9 +46,12 @@ class ActionRunnerImpl(ActionRunner):
     default_error_provider: ErrorProvider
     alert_service: AlertService
 
-    async def run(self, *actions: Action, call: Any = None, error_provider: ErrorProvider = None) -> Result:
+    async def run(self, *actions: Action | Callable[[Any, Any], Any], call: Any = None,
+                  error_provider: ErrorProvider = None) -> Result:
         r = Result()
         for action in actions[0]:
+            if callable(action) and not isinstance(action, Action):
+                action = CallableAction(call=action)
             try:
                 if inspect.iscoroutinefunction(action.run):
                     r.result = await action.run(call, r.result)
