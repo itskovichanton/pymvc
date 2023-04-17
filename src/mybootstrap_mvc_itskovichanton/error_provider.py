@@ -24,7 +24,8 @@ class ErrorProvider(Protocol):
 
 
 @bean(details_enabled=("mvc.response.details", bool, True),
-      original_msg=("mvc.response.original_error_msg", bool, True))
+      context_enabled=("mvc.response.error-context-enabled", bool, True),
+      original_msg=("mvc.response.original-error-msg", bool, True))
 class ErrorProviderImpl(ErrorProvider):
 
     def provide_error(self, e: BaseException) -> Err:
@@ -34,12 +35,13 @@ class ErrorProviderImpl(ErrorProvider):
             if hasattr(e, "invalid_value"):
                 r.invalid_value = e.invalid_value
             r.validation_reason = e.validation_reason
-        e_dict = e.__dict__
-        if e_dict:
-            try:
-                r.context = {k: str(v) for k, v in e_dict.items() if k not in r.__dict__}
-            except:
-                ...
+        if self.context_enabled:
+            e_dict = e.__dict__
+            if e_dict:
+                try:
+                    r.context = {k: str(v) for k, v in e_dict.items() if k not in r.__dict__}
+                except:
+                    ...
         return r
 
     def calc_msg(self, e: BaseException):
