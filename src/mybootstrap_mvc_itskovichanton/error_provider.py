@@ -4,7 +4,6 @@ from typing import Protocol
 
 from src.mybootstrap_core_itskovichanton.validation import ValidationException
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
-
 from src.mybootstrap_mvc_itskovichanton.exceptions import CoreException, ERR_REASON_INTERNAL
 
 ERR_MSG_INTERNAL = "Произошла внутренняя ошибка. Мы уже занимаемся решением этой проблемы."
@@ -15,7 +14,6 @@ class Err:
     message: str = None
     details: str = None
     reason: str = None
-    context: str = None
 
 
 class ErrorProvider(Protocol):
@@ -24,7 +22,6 @@ class ErrorProvider(Protocol):
 
 
 @bean(details_enabled=("mvc.response.details", bool, True),
-      context_enabled=("mvc.response.error-context-enabled", bool, True),
       original_msg=("mvc.response.original-error-msg", bool, True))
 class ErrorProviderImpl(ErrorProvider):
 
@@ -35,13 +32,10 @@ class ErrorProviderImpl(ErrorProvider):
             if hasattr(e, "invalid_value"):
                 r.invalid_value = e.invalid_value
             r.validation_reason = e.validation_reason
-        if self.context_enabled:
-            e_dict = e.__dict__
-            if e_dict:
-                try:
-                    r.context = {k: str(v) for k, v in e_dict.items() if k not in r.__dict__}
-                except:
-                    ...
+        try:
+            r.__dict__.update(e.__dict__)
+        except:
+            ...
         return r
 
     def calc_msg(self, e: BaseException):

@@ -6,6 +6,9 @@ from src.mybootstrap_mvc_itskovichanton.pipeline import Result
 
 class ResultPresenter(Protocol):
 
+    def preprocess_result(self, r: Result) -> Any:
+        return r
+
     def present(self, r: Result) -> Any:
         """Get http response"""
 
