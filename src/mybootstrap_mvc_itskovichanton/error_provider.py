@@ -2,9 +2,11 @@ import traceback
 from dataclasses import dataclass
 from typing import Protocol
 
+from pydantic import ValidationError
 from src.mybootstrap_core_itskovichanton.validation import ValidationException
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
-from src.mybootstrap_mvc_itskovichanton.exceptions import CoreException, ERR_REASON_INTERNAL
+
+from src.mybootstrap_mvc_itskovichanton.exceptions import CoreException, ERR_REASON_INTERNAL, ERR_REASON_VALIDATION
 
 ERR_MSG_INTERNAL = "Произошла внутренняя ошибка. Мы уже занимаемся решением этой проблемы."
 
@@ -14,6 +16,7 @@ class Err:
     message: str = None
     details: str = None
     reason: str = None
+    cause: str = None
 
 
 class ErrorProvider(Protocol):
@@ -26,7 +29,8 @@ class ErrorProvider(Protocol):
 class ErrorProviderImpl(ErrorProvider):
 
     def provide_error(self, e: BaseException) -> Err:
-        r = Err(message=self.calc_msg(e), details=self.calc_details(e), reason=self.calc_reason(e))
+        r = Err(message=self.calc_msg(e), details=self.calc_details(e), reason=self.calc_reason(e),
+                cause=self.calc_cause(e))
         if isinstance(e, ValidationException):
             r.param = e.param
             if hasattr(e, "invalid_value"):
@@ -45,4 +49,11 @@ class ErrorProviderImpl(ErrorProvider):
         return "\n.".join(traceback.format_exception(e)) if self.details_enabled else None
 
     def calc_reason(self, e: BaseException):
-        return e.reason if isinstance(e, CoreException) else ERR_REASON_INTERNAL
+        if isinstance(e, ValidationError):
+            return ERR_REASON_VALIDATION
+        if isinstance(e, CoreException):
+            return e.reason
+        return ERR_REASON_INTERNAL
+
+    def calc_cause(self, e: BaseException):
+        return e.cause if isinstance(e, CoreException) else None
