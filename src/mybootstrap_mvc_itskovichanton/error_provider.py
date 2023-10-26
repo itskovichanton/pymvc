@@ -1,22 +1,22 @@
 import traceback
-from dataclasses import dataclass
 from typing import Protocol
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError, Extra
 from src.mybootstrap_core_itskovichanton.validation import ValidationException
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
-
 from src.mybootstrap_mvc_itskovichanton.exceptions import CoreException, ERR_REASON_INTERNAL, ERR_REASON_VALIDATION
 
 ERR_MSG_INTERNAL = "Произошла внутренняя ошибка. Мы уже занимаемся решением этой проблемы."
 
 
-@dataclass
-class Err:
+class Err(BaseModel):
     message: str = None
     details: str = None
     reason: str = None
     cause: str = None
+
+    class Config:
+        extra = Extra.allow
 
 
 class ErrorProvider(Protocol):
