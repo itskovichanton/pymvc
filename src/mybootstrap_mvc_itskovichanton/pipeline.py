@@ -28,14 +28,17 @@ class Action:
 @dataclass
 class CallableAction(Action):
     call: Callable[[Any], Any]
+    unbox_call: bool = False
 
     def run(self, args: Any = None) -> Any:
+        if self.unbox_call:
+            return self.call(**args)
         return self.call(args)
 
 
 class ActionRunner:
 
-    async def run(self, *actions: Action | Callable[[Any], Any], call: Any = None,
+    async def run(self, *actions: Action | Callable[[Any], Any], call: Any = None, unbox_call: bool = False,
                   error_provider: ErrorProvider = None) -> Result:
         ...
 
@@ -48,13 +51,14 @@ class ActionRunnerImpl(ActionRunner):
     async def run(self,
                   *actions: Action | Callable[[Any], Any],
                   call: Any = None,
+                  unbox_call: bool = False,
                   error_provider: ErrorProvider = None) -> Result:
 
         r = Result()
         r.result = call
         for action in actions:
             if callable(action) and not isinstance(action, Action):
-                action = CallableAction(call=action)
+                action = CallableAction(call=action, unbox_call=unbox_call)
             try:
                 if inspect.iscoroutinefunction(action.run):
                     r.result = await action.run(r.result)
