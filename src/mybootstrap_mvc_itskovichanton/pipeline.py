@@ -57,10 +57,11 @@ class ActionRunnerImpl(ActionRunner):
         r = Result()
         r.result = call
         for action in actions:
+            coroutine = inspect.iscoroutinefunction(action)
             if callable(action) and not isinstance(action, Action):
                 action = CallableAction(call=action, unbox_call=unbox_call)
             try:
-                if inspect.iscoroutinefunction(action.run):
+                if coroutine:
                     r.result = await action.run(r.result)
                 else:
                     r.result = action.run(r.result)
