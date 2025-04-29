@@ -13,10 +13,19 @@ ERR_REASON_TOO_MANY_REQUESTS = "TO_MANY_REQUESTS"
 ERR_REASON_NOT_IMPLEMENTED = "ERR_REASON_NOT_IMPLEMENTED"
 
 
+def is_core_ex(e):
+    return isinstance(e, CoreException)
+
+
+def is_not_core_ex(e):
+    return not is_core_ex(e)
+
+
 class CoreException(BaseException):
     """Base exception, that has message and reason properties"""
 
-    def __init__(self, message=None, reason=ERR_REASON_SERVER_RESPONDED_WITH_ERROR, cause: BaseException = None, **kwargs):
+    def __init__(self, message=None, reason=ERR_REASON_SERVER_RESPONDED_WITH_ERROR, cause: BaseException = None,
+                 **kwargs):
         if not message and cause:
             message = str(cause)
         self.reason = reason
