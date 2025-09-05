@@ -21,6 +21,8 @@ class ResultPresenter(Protocol):
                 return 501
             case exceptions.ERR_REASON_SERVER_RESPONDED_WITH_ERROR:
                 return 200
+            case exceptions.ERR_REASON_SERVER_RESPONDED_WITH_FATAL_ERROR:
+                return 200
             case exceptions.ERR_REASON_TOO_MANY_REQUESTS:
                 return 429
             case exceptions.ERR_REASON_ACCESS_DENIED:
