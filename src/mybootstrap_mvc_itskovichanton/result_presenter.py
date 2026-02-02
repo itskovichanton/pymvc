@@ -17,6 +17,8 @@ class ResultPresenter(Protocol):
             return 200
 
         match r.error.reason:
+            case exceptions.ERR_REASON_UPGRADE_REQUIRED:
+                return 426
             case exceptions.ERR_REASON_NOT_IMPLEMENTED:
                 return 501
             case exceptions.ERR_REASON_SERVER_RESPONDED_WITH_ERROR:
