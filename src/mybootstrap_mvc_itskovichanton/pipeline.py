@@ -2,7 +2,8 @@ import inspect
 from dataclasses import dataclass
 from typing import Any, Callable, Protocol
 
-from src.mybootstrap_core_itskovichanton.alerts import AlertService
+from src.mybootstrap_core_itskovichanton.alerts import AlertService, Alert
+from src.mybootstrap_core_itskovichanton.utils import trim_string
 from src.mybootstrap_ioc_itskovichanton.ioc import bean
 from src.mybootstrap_mvc_itskovichanton.error_provider import Err, ErrorProvider
 
@@ -67,7 +68,8 @@ class ActionRunnerImpl(ActionRunner):
                 else:
                     r.result = action.run(r.result)
             except BaseException as e:
-                self.alert_service.handle(e)
+                action_chain = " -> ".join([trim_string(str(s), limit=50) for s in actions])
+                self.alert_service.handle(e, alert=Alert(subject=f"[actions:{action_chain}]"))
                 if error_provider is None:
                     error_provider = self.default_error_provider
                 r.error = error_provider.provide_error(e)

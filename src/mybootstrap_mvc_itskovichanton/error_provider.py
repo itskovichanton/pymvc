@@ -31,6 +31,10 @@ class ErrorProviderImpl(ErrorProvider):
     def provide_error(self, e: BaseException) -> Err:
         r = Err(message=self.calc_msg(e), details=self.calc_details(e), reason=self.calc_reason(e),
                 cause=self.calc_cause(e))
+
+        if isinstance(e, TimeoutError):
+            r.message = "Ведутся плановые работы. Повторите попытку позже."
+
         if isinstance(e, ValidationException):
             r.param = e.param
             if hasattr(e, "invalid_value"):
