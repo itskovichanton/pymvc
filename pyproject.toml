@@ -16,6 +16,12 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dependencies = [
+    "pydantic",
+]
 
 [project.urls]
 "Homepage" = "https://github.com/itskovichanton/pymvc"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
