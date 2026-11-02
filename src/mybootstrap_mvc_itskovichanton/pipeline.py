@@ -13,6 +13,7 @@ class Call:
     request: Any
     ip: str = None
     user_agent: str = None
+    port: int = None
 
 
 @dataclass
